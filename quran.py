@@ -24,15 +24,24 @@ class Quran(commands.Cog):
     async def randomVerse(self, ctx):
         surah = self.chapters[random.randint(0, 113)]
         verse_num = random.randint(0, surah["total_verses"]-1)
+        await self.response(ctx, surah, verse_num)
 
+    @commands.command()
+    async def verse(self,ctx, surahVerse):
+        try:
+            surah_num, verse_num = surahVerse.split(":")
+            surah = self.chapters[int(surah_num)-1]
+            verse_num = int(verse_num)
+            await self.response(ctx, surah, verse_num-1)
+        except:
+            await ctx.send("Please enter a valid Surah and Verse number (example 114:1)")
+
+    async def response(self, ctx, surah, verse_num):
         arabic = self.quran[str(surah["id"])][verse_num]["text"]
         trans = self.transliteration[str(surah["id"])][verse_num]["text"]
         english = self.quran_en[str(surah["id"])][verse_num]["text"]
-        await ctx.send(f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah["transliteration"]}:{verse_num}")
-
-    @commands.command()
-    async def translateVerse(self,ctx):
-        pass
+        await ctx.send(
+            f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah["transliteration"]}:{verse_num}")
 
     @commands.command()
     async def surah(self, ctx, *args):
