@@ -19,23 +19,27 @@ class PrayerTimesCog(commands.Cog):
         self.reminder_loop.cancel()
 
     @commands.command(name="location")
-    async def set_location(self, ctx):
-        await ctx.send("Salam Alaikum, Can you provide a city? (e.g., London, New York, Dubai)")
+    async def set_location(self, ctx, location: str = None):
 
-        def check(m):
-            return m.author == ctx.author and m.channel == ctx.channel
+        if location is None:
+            await ctx.send("Salam Alaikum, Can you provide a city? (e.g., London, New York, Dubai)")
 
-        try:
-            msg = await self.bot.wait_for('message', check=check, timeout=60)
-        except asyncio.TimeoutError:
-            return await ctx.send("Sorry, took too long to respond. Please try the command again.")
+            def check(m):
+                return m.author == ctx.author and m.channel == ctx.channel
+
+            try:
+                msg = await self.bot.wait_for('message', check=check, timeout=60)
+            except asyncio.TimeoutError:
+                return await ctx.send("Sorry, took too long to respond. Please try the command again.")
+
+            location = msg.content
 
         self.guild_settings[ctx.guild.id] = {
-            'location': msg.content,
+            'location': location,
             'channel_id': ctx.channel.id,
         }
 
-        await ctx.send(f"Great! I've set your location to **{msg.content}** and will use it to fetch prayer times.")
+        await ctx.send(f"Great! I've set your location to **{location}** and will use it to fetch prayer times.")
 
     @commands.command(name="pray")
     async def go_to_prayer(self, ctx, name="NoOne"):
