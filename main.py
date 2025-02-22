@@ -29,7 +29,5 @@ async def on_ready():
     await bot.load_extension("cogs.dua")
     await bot.load_extension('cogs.hadith')
     print("All cogs loaded!")
-async def load_cogs():
-    await bot.add_cog(Test(bot))
 
 bot.run(TOKEN)
