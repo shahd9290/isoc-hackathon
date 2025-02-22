@@ -36,6 +36,7 @@ class Quran(commands.Cog):
     async def surah(self, ctx, surah_num):
         name = self.chapters[int(surah_num)-1]["name"]
         name_trans = self.chapters[int(surah_num)-1]["transliteration"]
-        await ctx.send(f"# __{name} - {name_trans}__")
+        msg = f"# __{name} - {name_trans}__ \n"
         for verse in self.quran[surah_num]:
-            await ctx.send(f"## ﴾{verse["verse"]}﴿ - {verse["text"]}")
+            msg += f"## ﴾{verse["verse"]}﴿ - {verse["text"]}\n"
+        await ctx.send(msg)
