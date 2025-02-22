@@ -3,6 +3,7 @@ import os
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
+import asyncio
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -28,6 +29,16 @@ class Zakat(commands.Cog):
             await ctx.send("you do not meet the threshold, no worries. ")
 
     
+    @commands.command()
+    async def zakatHelp(self,ctx):
+        help_embed = discord.Embed(title="", colour= discord.Colour.purple())
+        
+        help_embed.add_field(name="Quick Calculation", value="use `!zakat [amount] to calculate zakat for a singular amount", inline=False)
+        help_embed.add_field(name="Detailed Calculation",value="use `!zakatCalc for a more interactive and detailed calculation",inline=False)
+        help_embed.add_field(name="About Nisab", value=f"Current Nisab threshold: {85 * self.gold_price:,.2f}" " (based on 85g of gold)",inline=False)
+        await ctx.send(embed = help_embed)
+
+
     @commands.command()
     async def zakatCalc (self,ctx):
         try:
@@ -60,8 +71,13 @@ class Zakat(commands.Cog):
             await ctx.send(embed=result_embed)
 
         except ValueError:
-            await ctx.send("please enter correct values.")
-        except TimeoutError:
-            await ctx.send("calculation time out.")
+            error_embed= discord.Embed(title= "❌ invalid input", description="Please enter numbers", color=discord.Colour.blurple())
+            await ctx.send(embed= error_embed)
+        except asyncio.TimeoutError:
+            error_embed = discord.Embed(title="❌ Calculation Timeout",description="Calculation timed out due to no response",color=discord.Color.dark_magenta())
+            error_embed.add_field(name="What happened?",value="You did not respond within time limit",inline=False)
+            error_embed.add_field(name="What to do?",value="Please use !zakatCalc to start new calculation",inline=False)
+
+            await ctx.send(embed= error_embed)
 
 
