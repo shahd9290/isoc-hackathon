@@ -31,16 +31,15 @@ class Zakat(commands.Cog):
     @commands.command()
     async def zakatCalc (self,ctx):
         try:
-            embed = discord.Embed(title="Zakat Calculator", color=discord.colour.red())
+            embed = discord.Embed(title="Zakat Calculator", colour=discord.Colour.blue())
             embed.description = "Enter assets in following categories"
             await ctx.send(embed=embed)
 
 
 
-
             async def getAmount(prompt):
                 await ctx.send(prompt)
-                msg = await self.bot.wait_for('message',timeout = 30.0, check = lambda m: m.author == ctx.author)
+                msg = await self.bot.wait_for('message',timeout = 5.0, check = lambda m: m.author == ctx.author)
                 return float (msg.content)
             
             cash = await getAmount("enter cash savings")
@@ -51,26 +50,18 @@ class Zakat(commands.Cog):
             total_wealth = cash + gold+ investment+ business
             zakat_amount = total_wealth * 0.025
 
-            result_embed = discord.Embed(title="zakat calculation result", color= discord.color.green())
-            result_embed.add_field(name="cash savings")
-            result_embed.add_field(name="Gold")
-            result_embed.add_field(name="")
-            result_embed.add_field(name="")
-            result_embed.add_field(name="")
-            result_embed.add_field(name="")
-
-
-
-
-
-
-
-
-
+            result_embed = discord.Embed(title="zakat calculation result", colour= discord.Colour.blue())
+            result_embed.add_field(name="cash savings", value= f"{cash:,.2f}", inline=False)
+            result_embed.add_field(name="Gold",value= f"{gold:,.2f}", inline=False)
+            result_embed.add_field(name="Investments",value= f"{investment:,.2f}", inline=False)
+            result_embed.add_field(name="Business Assets",value= f"{business:,.2f}", inline=False)
+            result_embed.add_field(name="Total Wealth",value= f"{total_wealth:,.2f}", inline=False)
+            result_embed.add_field(name="Zakat Amount (2.5%)",value= f"{zakat_amount:,.2f}", inline=False)
+            await ctx.send(embed=result_embed)
 
         except ValueError:
-            ctx.send("please enter correct values.")
+            await ctx.send("please enter correct values.")
         except TimeoutError:
-            ctx.send("calculation time out.")
+            await ctx.send("calculation time out.")
 
 

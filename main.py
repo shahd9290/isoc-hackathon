@@ -4,7 +4,7 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 
-from test import Test
+
 from uhhhh import Zakat
 
 load_dotenv()
@@ -17,9 +17,8 @@ intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
 async def load_cogs():
-    await bot.add_cog(Test(bot))  # Now we await it inside an async function
+    #await bot.add_cog(Test(bot))  # Now we await it inside an async function
     await bot.add_cog(Zakat(bot))
-
     
 @bot.event
 async def on_ready():
