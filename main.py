@@ -1,7 +1,10 @@
 import os
+
 import discord
 from dotenv import load_dotenv
 from discord.ext import commands
+
+from test import Test
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -18,5 +21,7 @@ async def on_ready():
     await bot.load_extension("cogs.dua")
     await bot.load_extension('cogs.hadith')
     print("All cogs loaded!")
+async def load_cogs():
+    await bot.add_cog(Test(bot))
 
 bot.run(TOKEN)
