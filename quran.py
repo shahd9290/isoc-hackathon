@@ -27,8 +27,11 @@ class Quran(commands.Cog):
         await self.response(ctx, surah, verse_num)
 
     @commands.command()
-    async def verse(self,ctx, surahVerse):
+    async def verse(self,ctx, *args):
         try:
+            if len(args) == 0:
+                raise Exception()
+            surahVerse = args[0]
             surah_num, verse_num = surahVerse.split(":")
             surah = self.chapters[int(surah_num)-1]
             verse_num = int(verse_num)
