@@ -1,0 +1,55 @@
+{
+    "quiz": [
+      {
+        "question": "What is the first pillar of Islam?",
+        "options": ["Salah", "Zakat", "Shahada", "Hajj"],
+        "answer": "Shahada"
+      },
+      {
+        "question": "How many chapters (Surahs) are there in the Quran?",
+        "options": ["100", "114", "99", "120"],
+        "answer": "114"
+      },
+      {
+        "question": "Who was the last prophet in Islam?",
+        "options": ["Prophet Musa", "Prophet Isa", "Prophet Muhammad", "Prophet Ibrahim"],
+        "answer": "Prophet Muhammad"
+      },
+      {
+        "question": "Which angel is responsible for delivering revelations to prophets?",
+        "options": ["Angel Mika'il", "Angel Jibril", "Angel Israfil", "Angel Malik"],
+        "answer": "Angel Jibril"
+      },
+      {
+        "question": "What is the holiest city in Islam?",
+        "options": ["Medina", "Mecca", "Jerusalem", "Damascus"],
+        "answer": "Mecca"
+      },
+      {
+        "question": "What is the name of the night journey of Prophet Muhammad (PBUH) to the heavens?",
+        "options": ["Hijrah", "Isra and Mi'raj", "Badr", "Khandaq"],
+        "answer": "Isra and Mi'raj"
+      },
+      {
+        "question": "How many Rak'ahs are there in Fajr prayer?",
+        "options": ["2", "4", "3", "5"],
+        "answer": "2"
+      },
+      {
+        "question": "What is the Islamic term for charity given to the poor?",
+        "options": ["Sadaqah", "Hajj", "Zakat", "Fidyah"],
+        "answer": "Zakat"
+      },
+      {
+        "question": "Who was the first Caliph after Prophet Muhammad (PBUH)?",
+        "options": ["Umar ibn Khattab", "Uthman ibn Affan", "Ali ibn Abi Talib", "Abu Bakr"],
+        "answer": "Abu Bakr"
+      },
+      {
+        "question": "During which Islamic month is fasting (Sawm) obligatory?",
+        "options": ["Muharram", "Shawwal", "Ramadan", "Dhul-Hijjah"],
+        "answer": "Ramadan"
+      }
+    ]
+  }
+  
