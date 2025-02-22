@@ -21,7 +21,7 @@ class Quran(commands.Cog):
             self.chapters = json.load(chapters)
 
     @commands.command()
-    async def randomVerse(self, ctx):
+    async def randomverse(self, ctx):
         surah = self.chapters[random.randint(0, 113)]
         verse_num = random.randint(0, surah["total_verses"]-1)
         await self.response(ctx, surah, verse_num)
@@ -33,6 +33,8 @@ class Quran(commands.Cog):
                 raise Exception()
             surahVerse = args[0]
             surah_num, verse_num = surahVerse.split(":")
+            if int(surah_num) <= 0 or int(verse_num) <= 0:
+                raise Exception()
             surah = self.chapters[int(surah_num)-1]
             verse_num = int(verse_num)
             await self.response(ctx, surah, verse_num-1)
@@ -44,7 +46,7 @@ class Quran(commands.Cog):
         trans = self.transliteration[str(surah["id"])][verse_num]["text"]
         english = self.quran_en[str(surah["id"])][verse_num]["text"]
         await ctx.send(
-            f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah["transliteration"]}:{verse_num}")
+            f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah["transliteration"]}:{verse_num+1}")
 
     @commands.command()
     async def surah(self, ctx, *args):
