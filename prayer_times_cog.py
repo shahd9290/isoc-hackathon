@@ -61,23 +61,6 @@ class PrayerTimesCog(commands.Cog):
         else:
             await ctx.send("Unable to fetch prayer times. Please try again later.")
 
-    async def fetch_prayer_times(self, location):
-        url = f"{BASE_PRAYER_TIMES_API_URL}timingsByCity?city={location}&country=&method=2"
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    timings = data['data']['timings']
-                    return {
-                        "Fajr": timings['Fajr'],
-                        "Dhuhr": timings['Dhuhr'],
-                        "Asr": timings['Asr'],
-                        "Maghrib": timings['Maghrib'],
-                        "Isha": timings['Isha']
-                    }
-                else:
-                    return None
-
     @commands.command(name="hijri")
     async def get_hijri_date(self, ctx, date_str: str = None):
         # Date of today and current location
@@ -97,6 +80,71 @@ class PrayerTimesCog(commands.Cog):
                 await ctx.send(f"The Gregorian date {date_str} corresponds to the Hijri date: `{hijri_date}`")
             except ValueError:
                 await ctx.send("Please provide the date in the format DD-MM-YYYY.")
+
+    @commands.command(name="nextPrayer")
+    async def next_player(self, ctx):
+        if ctx.guild.id not in self.guild_settings:
+            return await ctx.send("Please set your location first using the `!location` command.")
+
+        location = self.guild_settings[ctx.guild.id]['location']
+        prayer_times = await self.fetch_prayer_times(location)
+        if not prayer_times:
+            return await ctx.send("Unable to fetch prayer times. Please try again later.")
+
+        now = datetime.datetime.now()
+        today = now.date()
+
+        prayer_times_dt = {}
+        for prayer, time_str in prayer_times.items():
+            try:
+                pt = datetime.datetime.strptime(time_str, "%H:%M")
+                pt = pt.replace(year=today.year, month=today.month, day=today.day)
+                prayer_times_dt[prayer] = pt
+            except Exception:
+                continue
+
+        # Filter to find upcoming prayers (those later than now)
+        upcoming = {p: t for p, t in prayer_times_dt.items() if t > now}
+        if upcoming:
+            # Select the prayer with the smallest time difference
+            next_prayer, next_time = min(upcoming.items(), key=lambda item: item[1])
+            delta = next_time - now
+        else:
+            # If no prayers remain today, fetch tomorrow's prayer times and use Fajr
+            tomorrow = today + datetime.timedelta(days=1)
+            prayer_times_tomorrow = await self.fetch_prayer_times(location, tomorrow)
+            if not prayer_times_tomorrow:
+                return await ctx.send("Unable to fetch tomorrow's prayer times.")
+            try:
+                fajr_time_str = prayer_times_tomorrow.get("Fajr")
+                next_time = datetime.datetime.strptime(fajr_time_str, "%H:%M")
+                next_time = next_time.replace(year=tomorrow.year, month=tomorrow.month, day=tomorrow.day)
+                next_prayer = "Fajr"
+                delta = next_time - now
+            except Exception:
+                return await ctx.send("Error determining tomorrow's Fajr time.")
+
+        hours, remainder = divmod(int(delta.total_seconds()), 3600)
+        minutes, _ = divmod(remainder, 60)
+        await ctx.send(f"Next prayer is **{next_prayer}** in {hours} hours and {minutes} minutes.")
+
+
+    async def fetch_prayer_times(self, location, date_str=None):
+        url = f"{BASE_PRAYER_TIMES_API_URL}timingsByCity?city={location}&country=&method=2" + (f"&date={date_str}" if date_str else "")
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    timings = data['data']['timings']
+                    return {
+                        "Fajr": timings['Fajr'],
+                        "Dhuhr": timings['Dhuhr'],
+                        "Asr": timings['Asr'],
+                        "Maghrib": timings['Maghrib'],
+                        "Isha": timings['Isha']
+                    }
+                else:
+                    return None
 
 
     async def fetch_hijri_date(self, location):
