@@ -83,7 +83,7 @@ class PrayerTimesCog(commands.Cog):
 
             if prayer_times:
                 for prayer, time in prayer_times.items():
-                    if time == "14:24":
+                    if time == now:
                         channel = self.bot.get_channel(channel_id)
                         if channel:
                             await channel.send(f"It's time for {prayer} prayer!")
