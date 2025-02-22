@@ -5,6 +5,8 @@ import datetime
 import aiohttp
 
 CHANNEL_ID = 1342837274991136808
+BASE_PRAYER_TIMES_API_URL = "http://api.aladhan.com/v1/timingsByCity"
+
 
 
 class PrayerTimesCog(commands.Cog):
@@ -56,7 +58,7 @@ class PrayerTimesCog(commands.Cog):
             await ctx.send("Unable to fetch prayer times. Please try again later.")
 
     async def fetch_prayer_times(self, location):
-        url = f"http://api.aladhan.com/v1/timingsByCity?city={location}&country=&method=2"
+        url = f"{BASE_PRAYER_TIMES_API_URL}?city={location}&country=&method=2"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
