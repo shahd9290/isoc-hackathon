@@ -38,5 +38,10 @@ class Quran(commands.Cog):
         name_trans = self.chapters[int(surah_num)-1]["transliteration"]
         msg = f"# __{name} - {name_trans}__ \n"
         for verse in self.quran[surah_num]:
-            msg += f"## ﴾{verse["verse"]}﴿ - {verse["text"]}\n"
+            next_verse = f"## ﴾{verse["verse"]}﴿ - {verse["text"]}\n"
+            if len(msg) + len(next_verse) < 2000:
+                msg += next_verse
+            else:
+                await ctx.send(msg)
+                msg = next_verse
         await ctx.send(msg)
