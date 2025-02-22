@@ -1,6 +1,6 @@
 from discord.ext import commands
-import discord
 import json
+import random
 
 # Inspiration: https://github.com/risan/quran-json?tab=readme-ov-file
 
@@ -22,14 +22,16 @@ class Quran(commands.Cog):
 
     @commands.command()
     async def randomVerse(self, ctx):
-        pass
+        surah = self.chapters[random.randint(0, 113)]
+        verse_num = random.randint(0, surah["total_verses"]-1)
+
+        arabic = self.quran[str(surah["id"])][verse_num]["text"]
+        trans = self.transliteration[str(surah["id"])][verse_num]["text"]
+        english = self.quran_en[str(surah["id"])][verse_num]["text"]
+        await ctx.send(f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah["transliteration"]}:{verse_num}")
 
     @commands.command()
     async def translateVerse(self,ctx):
-        pass
-
-    @commands.command()
-    async def listenToVerse(self, ctx):
         pass
 
     @commands.command()
