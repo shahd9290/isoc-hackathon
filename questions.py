@@ -20,23 +20,32 @@ class Questions(commands.Cog):
             await ctx.send("Great!")
             score = 0
             # load question
-            with open("data.json", "r") as file:
+            with open("data/data.json", "r") as file:
                 data = json.load(file)
             # loop through questions
             for questionJson in data["quiz"]:
                 question = questionJson["question"]
                 options = questionJson["options"]
-                answer = questionJson["answer"].lower()   
-                
                 desc = ""
-                for option in options:
-                    desc += f"{options.index(option)+1}. {option}\n"
-                embed = discord.Embed(title=question, colour=discord.Colour.red(), description=desc)          
+                for i in range(len(options)):
+                    desc += f"{i+1}. {options[i]}\n"
+                    options[i] = options[i].lower()
+                embed = discord.Embed(title=question, colour=discord.Colour.red(), description=desc)
+                answer = questionJson["answer"].lower()
+                ans_index = options.index(answer) + 1
                 await ctx.send(embed=embed)
-                # wait for user input
-                ans = await self.bot.wait_for("message", check=check, timeout=30.0)
+
                 # validation to make sure option is in options.
-                if ans.content.lower() == answer:
+                while True:
+                # wait for user input
+                    ans = await self.bot.wait_for("message", check=check, timeout=30.0)
+                    if ans.content.lower() in options or ans.content in ["1", "2", "3", "4"]:
+                        break
+                    else:
+                        await ctx.send("Invalid Option! Please enter the answer or corresponding number.")
+
+                # check if answer matches answer string or index + 1
+                if ans.content.lower() == answer or ans.content == str(ans_index):
                     await ctx.send("Correct!")
                     score += 1
                 else:
