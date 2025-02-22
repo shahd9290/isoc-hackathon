@@ -5,7 +5,7 @@ import datetime
 import aiohttp
 
 CHANNEL_ID = 1342837274991136808
-BASE_PRAYER_TIMES_API_URL = "http://api.aladhan.com/v1/timingsByCity"
+BASE_PRAYER_TIMES_API_URL = "http://api.aladhan.com/v1/"
 
 
 
@@ -58,7 +58,7 @@ class PrayerTimesCog(commands.Cog):
             await ctx.send("Unable to fetch prayer times. Please try again later.")
 
     async def fetch_prayer_times(self, location):
-        url = f"{BASE_PRAYER_TIMES_API_URL}?city={location}&country=&method=2"
+        url = f"{BASE_PRAYER_TIMES_API_URL}timingsByCity?city={location}&country=&method=2"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
@@ -73,6 +73,49 @@ class PrayerTimesCog(commands.Cog):
                     }
                 else:
                     return None
+
+    @commands.command(name="hijri")
+    async def get_hijri_date(self, ctx, date_str: str = None):
+        # Date of today and current location
+        if date_str is None:
+            if ctx.guild.id not in self.guild_settings:
+                return await ctx.send("Please set your location first using the `!location` command.")
+
+            location = self.guild_settings[ctx.guild.id]['location']
+            # Get current Hijri date
+            hijri_date = await self.fetch_hijri_date(location)
+            await ctx.send(f"The current Hijri date in {location} is: `{hijri_date}`")
+        else:
+            # Convert given Gregorian date to Hijri
+            try:
+                date = datetime.datetime.strptime(date_str, "%d-%m-%Y")
+                hijri_date = await self.convert_to_hijri(date)
+                await ctx.send(f"The Gregorian date {date_str} corresponds to the Hijri date: `{hijri_date}`")
+            except ValueError:
+                await ctx.send("Please provide the date in the format DD-MM-YYYY.")
+
+
+    async def fetch_hijri_date(self, location):
+        url = f"{BASE_PRAYER_TIMES_API_URL}timingsByCity?city={location}&country=&method=2"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    hijri = data['data']['date']['hijri']
+                    return f"{hijri['day']} {hijri['month']['en']} {hijri['year']} AH"
+                else:
+                    return "Unable to fetch Hijri date"
+
+    async def convert_to_hijri(self, date):
+        url = f"{BASE_PRAYER_TIMES_API_URL}gToH?date={date.strftime('%d-%m-%Y')}"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    hijri = data['data']['hijri']
+                    return f"{hijri['day']} {hijri['month']['en']} {hijri['year']} AH"
+                else:
+                    return "Unable to convert date"
 
     @tasks.loop(minutes=1)
     async def reminder_loop(self):
