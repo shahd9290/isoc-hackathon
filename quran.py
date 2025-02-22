@@ -35,7 +35,11 @@ class Quran(commands.Cog):
         pass
 
     @commands.command()
-    async def surah(self, ctx, surah_num):
+    async def surah(self, ctx, *args):
+        if len(args) == 0 or not args[0].isdigit():
+            await ctx.send("Please enter a valid number for the surah! (1 - 114)")
+            return
+        surah_num = args[0]
         name = self.chapters[int(surah_num)-1]["name"]
         name_trans = self.chapters[int(surah_num)-1]["transliteration"]
         msg = f"# __{name} - {name_trans}__ \n"
