@@ -135,7 +135,10 @@ class PrayerTimesCog(commands.Cog):
                     if time == now:
                         channel = self.bot.get_channel(channel_id)
                         if channel:
-                            await channel.send(f"It's time for {prayer} prayer!")
+                            embed = discord.Embed(title=f"It's time for {prayer} prayer!", color=0x00ff00)
+                            embed.add_field(name="Location", value=location, inline=False)
+                            await channel.send(content="@everyone", embed=embed)
+                            await channel.send(embed=embed)
 
     @reminder_loop.before_loop
     async def before_reminder_loop(self):
