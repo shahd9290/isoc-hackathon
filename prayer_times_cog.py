@@ -63,17 +63,25 @@ class PrayerTimesCog(commands.Cog):
 
     @commands.command(name="hijri")
     async def get_hijri_date(self, ctx, date_str: str = None):
-        # Date of today and current location
         if date_str is None:
             if ctx.guild.id not in self.guild_settings:
                 return await ctx.send("Please set your location first using the `!location` command.")
-
             location = self.guild_settings[ctx.guild.id]['location']
-            # Get current Hijri date
-            hijri_date = await self.fetch_hijri_date(location)
-            await ctx.send(f"The current Hijri date in {location} is: `{hijri_date}`")
+            hijri_info = await self.fetch_hijri_date_info(location)
+            if hijri_info:
+                embed = discord.Embed(title=f"Hijri Date Information for {location}", color=0x00ff00)
+                embed.add_field(name="Hijri Date", value=hijri_info["date"], inline=False)
+                if hijri_info["weekday"]:
+                    embed.add_field(name="Weekday", value=hijri_info["weekday"], inline=True)
+                if hijri_info["designation"]:
+                    embed.add_field(name="Designation", value=hijri_info["designation"], inline=True)
+                if hijri_info["holidays"]:
+                    embed.add_field(name="Holidays", value=", ".join(hijri_info["holidays"]), inline=False)
+                await ctx.send(embed=embed)
+            else:
+                await ctx.send("Unable to fetch Hijri date information.")
         else:
-            # Convert given Gregorian date to Hijri
+            # Convert given Gregorian date to Hijri (using your existing convert_to_hijri function)
             try:
                 date = datetime.datetime.strptime(date_str, "%d-%m-%Y")
                 hijri_date = await self.convert_to_hijri(date)
@@ -168,6 +176,27 @@ class PrayerTimesCog(commands.Cog):
                     return f"{hijri['day']} {hijri['month']['en']} {hijri['year']} AH"
                 else:
                     return "Unable to convert date"
+
+
+    async def fetch_hijri_date_info(self, location):
+        url = f"{BASE_PRAYER_TIMES_API_URL}timingsByCity?city={location}&country=&method=2"
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    hijri = data['data']['date']['hijri']
+                    date_str = f"{hijri['day']} {hijri['month']['en']} {hijri['year']} AH"
+                    weekday = hijri.get('weekday', {}).get('en', '')
+                    designation = hijri.get('designation', {}).get('expanded', '')
+                    holidays = hijri.get('holidays', [])
+                    return {
+                        "date": date_str,
+                        "weekday": weekday,
+                        "designation": designation,
+                        "holidays": holidays,
+                    }
+                else:
+                    return None
 
     @tasks.loop(minutes=1)
     async def reminder_loop(self):
