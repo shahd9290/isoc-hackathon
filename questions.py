@@ -27,6 +27,10 @@ class Questions(commands.Cog):
         await ctx.send("Do you want to start a quiz?")
 
         def check(m):
+            """
+            Ensures that the response is sent by the same person who initiated the quiz, whilst in the same channel
+            :param m: The user's message
+            """
             return m.author == ctx.author and m.channel == ctx.channel
 
         msg = await self.bot.wait_for("message", check=check, timeout=30.0)
