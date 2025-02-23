@@ -19,6 +19,7 @@
 - [API Docs](#api-docs)
 - [Build & Deployment](#build--deployment)
 - [Contribution Guide](#contribution-guide)
+- [Invite Link](https://discord.com/oauth2/authorize?client_id=1342798853685903380&permissions=123968&integration_type=0&scope=bot)
 
 ## Project Overview
 ### Description
