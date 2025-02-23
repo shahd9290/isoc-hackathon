@@ -83,4 +83,7 @@ class Questions(commands.Cog):
             # increment score
         else:
             await ctx.send("Nevermind!")
+
+async def setup(bot):
+    await bot.add_cog(Questions(bot))
         

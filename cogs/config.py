@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-class Test(commands.Cog):
+class Config(commands.Cog):
     """Test class used to test configuration of the discord.py library"""
     def __init__(self, bot):
         """
@@ -34,3 +34,5 @@ class Test(commands.Cog):
             await ctx.send(sum)
         except:
             await ctx.send("Detected Strings!")
+async def setup(bot):
+    await bot.add_cog(Config(bot))

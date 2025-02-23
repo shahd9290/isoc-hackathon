@@ -131,3 +131,5 @@ class Quran(commands.Cog):
         else:
             ctx.send("Invalid!")
 
+async def setup(bot):
+    await bot.add_cog(Quran(bot))
