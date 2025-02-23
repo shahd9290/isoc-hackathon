@@ -22,6 +22,7 @@ async def on_ready():
     await bot.load_extension('cogs.quran')
     await bot.load_extension('cogs.config')
     await bot.load_extension('cogs.zakat')
+    await bot.load_extension('cogs.prayer_times_cog')
     print("All cogs loaded!")
 
 bot.run(TOKEN)
