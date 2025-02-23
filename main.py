@@ -4,6 +4,9 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 
+
+from uhhhh import Zakat
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
