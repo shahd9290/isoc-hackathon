@@ -3,6 +3,9 @@ import discord
 import json
 import random
 
+from paginator import Paginator
+
+
 # Data Source: https://github.com/risan/quran-json?tab=readme-ov-file
 
 class Quran(commands.Cog):
@@ -97,15 +100,23 @@ class Quran(commands.Cog):
             surah_num = args[0]
         name = self.chapters[int(surah_num)-1]["name"]
         name_trans = self.chapters[int(surah_num)-1]["transliteration"]
-        msg = f"# __{name} - {name_trans}__ \n"
+        messages = []
+        msg = ""
         for verse in self.quran[surah_num]:
-            next_verse = f"## ﴾{verse['verse']}﴿ - {verse['text']}\n"
+            verse_num = verse['verse']
+            arabic = verse['text']
+
+            next_verse = f"## ﴾{verse_num}﴿ - {arabic}\n"
+
             if len(msg) + len(next_verse) < 2000:
                 msg += next_verse
             else:
-                await ctx.send(msg)
+                messages.append(msg)
                 msg = next_verse
-        await ctx.send(msg)
+        messages.append(msg)
+
+        view = Paginator(messages, title=f"__{name} - {name_trans}__ \n")
+        await ctx.send(embed = view.get_embed(), view=view)
 
     @commands.command(help="Get a list of all the surahs!")
     async def view(self, ctx, *args):
@@ -113,48 +124,10 @@ class Quran(commands.Cog):
             ctx.send("Please state what you would like to view!")
             return
         elif args[0] == "surahs":
-            await self.paginated_surah_list(ctx)
+            items_per_page = 10
+            pages = ["\n".join([f"**{chapter['id']}.** {chapter['transliteration']} - {chapter['name']}" for chapter in self.chapters[i:i+items_per_page]]) for i in range(0, len(self.chapters), items_per_page)]
+            view = Paginator(pages, title="List of Surahs from the Quran")
+            await ctx.send(embed=view.get_embed(), view=view)
         else:
             ctx.send("Invalid!")
 
-    async def paginated_surah_list(self, ctx):
-        items_per_page = 10
-        pages = [self.chapters[i:i+items_per_page] for i in range(0, len(self.chapters), items_per_page)]
-
-        view = SurahPaginator(pages)
-        await ctx.send(embed=view.get_embed(), view=view)
-
-class SurahPaginator(discord.ui.View):
-    def __init__(self, pages):
-        super().__init__()
-        self.pages = pages
-        self.current_page = 0
-
-    def get_embed(self):
-        embed = discord.Embed(
-            title="List of Surahs from the Quran",
-            description=f"Page {self.current_page + 1} of {len(self.pages)}",
-            color=discord.Colour.blue()
-        )
-        for chapter in self.pages[self.current_page]:
-            embed.add_field(name=f"{chapter['name']} .{chapter['id']} ", value=f"{chapter['transliteration']} - {chapter['translation']}", inline=False)
-        return embed
-
-    @discord.ui.button(label="◀", style=discord.ButtonStyle.primary, disabled=True)
-    async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        """Handles previous page navigation."""
-        self.current_page -= 1
-        self.update_buttons()
-        await interaction.response.edit_message(embed=self.get_embed(), view=self)
-
-    @discord.ui.button(label="▶", style=discord.ButtonStyle.primary)
-    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
-        """Handles next page navigation."""
-        self.current_page += 1
-        self.update_buttons()
-        await interaction.response.edit_message(embed=self.get_embed(), view=self)
-
-    def update_buttons(self):
-        """Disables or enables buttons based on the page number."""
-        self.prev_button.disabled = self.current_page == 0
-        self.next_button.disabled = self.current_page == len(self.pages) - 1
