@@ -46,7 +46,7 @@ class SunnahReminder(commands.Cog):
             embed.timestamp = discord.utils.utcnow() #Adds the current date and time to the discord embed message 
             await channel.send(embed=embed)
 
-            #await channel.send(f"{sunnah['text']} - {sunnah['source']}")
+            
 
     @reminder.before_loop
     async def before_reminder(self): 

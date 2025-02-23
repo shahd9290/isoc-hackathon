@@ -13,7 +13,7 @@ class DuaReminder(commands.Cog):
     def __init__(self,bot):
         self.bot = bot  
         self.dua= self.load_dua() 
-        self.dua.start()  
+        self.reminder.start()  
 
     def load_dua(self): 
         try: 
