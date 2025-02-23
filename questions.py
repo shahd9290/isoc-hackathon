@@ -3,11 +3,24 @@ import discord
 import json
 
 class Questions(commands.Cog):
+    """
+    This component is used to generate and run an interactive Islamic quiz, used to test the user's knowledge on a selection of Islamic topics.
+    Topics are currently limited however there is always room to expand in the future.
+    """
     def __init__(self, bot):
+        """
+        Initialises the Questions component
+        :param bot: The bot object used to send commands
+        """
         self.bot = bot
 
     @commands.command()
-    async def quiz(self, ctx):
+    async def quiz(self, ctx) -> None:
+        """
+        The quiz command, used to generate and run the interactive Islamic quiz.
+        :param ctx: The context of the channel this was called from
+        :return: None
+        """
         member = ctx.author
         await ctx.send("Do you want to start a quiz?")
 
