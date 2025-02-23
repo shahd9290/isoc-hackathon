@@ -63,6 +63,11 @@ class PrayerTimesCog(commands.Cog):
 
     @commands.command(name="hijri")
     async def get_hijri_date(self, ctx, date_str: str = None):
+        """
+        If no date is provided, fetches and displays the current Hijri date for your set location
+        along with details in both English and Arabic.
+        If a date is provided (in DD-MM-YYYY), converts that Gregorian date to Hijri.
+        """
         if date_str is None:
             if ctx.guild.id not in self.guild_settings:
                 return await ctx.send("Please set your location first using the `!location` command.")
@@ -70,11 +75,15 @@ class PrayerTimesCog(commands.Cog):
             hijri_info = await self.fetch_hijri_date_info(location)
             if hijri_info:
                 embed = discord.Embed(title=f"Hijri Date Information for {location}", color=0x00ff00)
-                embed.add_field(name="Hijri Date", value=hijri_info["date"], inline=False)
-                if hijri_info["weekday"]:
-                    embed.add_field(name="Weekday", value=hijri_info["weekday"], inline=True)
-                if hijri_info["designation"]:
-                    embed.add_field(name="Designation", value=hijri_info["designation"], inline=True)
+
+                embed.add_field(name="Hijri Date (EN)", value=hijri_info["date_en"], inline=True)
+                embed.add_field(name="Hijri Date (AR)", value=hijri_info["date_ar"], inline=True)
+
+                embed.add_field(name="\u200b", value="\u200b", inline=False)
+
+                embed.add_field(name="Weekday (EN)", value=hijri_info["weekday_en"], inline=True)
+                embed.add_field(name="Weekday (AR)", value=hijri_info["weekday_ar"], inline=True)
+
                 if hijri_info["holidays"]:
                     embed.add_field(name="Holidays", value=", ".join(hijri_info["holidays"]), inline=False)
                 await ctx.send(embed=embed)
@@ -185,14 +194,21 @@ class PrayerTimesCog(commands.Cog):
                 if response.status == 200:
                     data = await response.json()
                     hijri = data['data']['date']['hijri']
-                    date_str = f"{hijri['day']} {hijri['month']['en']} {hijri['year']} AH"
-                    weekday = hijri.get('weekday', {}).get('en', '')
-                    designation = hijri.get('designation', {}).get('expanded', '')
+                    # Extract both English and Arabic details
+                    date_en = f"{hijri['day']} {hijri['month']['en']} {hijri['year']} AH"
+                    date_ar = f"{hijri['day']} {hijri['month']['ar']} {hijri['year']} هـ"
+                    weekday_en = hijri.get('weekday', {}).get('en', '')
+                    weekday_ar = hijri.get('weekday', {}).get('ar', '')
+                    designation_en = hijri.get('designation', {}).get('expanded', '')
+                    designation_ar = hijri.get('designation', {}).get('ar', '')
                     holidays = hijri.get('holidays', [])
                     return {
-                        "date": date_str,
-                        "weekday": weekday,
-                        "designation": designation,
+                        "date_en": date_en,
+                        "date_ar": date_ar,
+                        "weekday_en": weekday_en,
+                        "weekday_ar": weekday_ar,
+                        "designation_en": designation_en,
+                        "designation_ar": designation_ar,
                         "holidays": holidays,
                     }
                 else:
