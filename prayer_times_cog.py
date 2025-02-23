@@ -16,7 +16,11 @@ class PrayerTimesCog(commands.Cog, name="Prayer Times Commands"):
     def cog_unload(self):
         self.reminder_loop.cancel()
 
-    @commands.command(name="location", help="Set your location for prayer times.")
+    @commands.command(
+        name="location",
+        help="Set your location for prayer times. You can provide a city name directly (e.g., !location New York) or be prompted for one if omitted.",
+        brief="Set location for prayer times"
+    )
     async def set_location(self, ctx, location: str = None):
         if location is None:
             await ctx.send("Salam Alaikum! Please provide a city (e.g., London, Dubai):")
@@ -43,7 +47,11 @@ class PrayerTimesCog(commands.Cog, name="Prayer Times Commands"):
 
         await ctx.send(f"📍 Location set to **{location}**. Use `!setreminder [minutes]` for pre-reminders.")
 
-    @commands.command(name="setreminder", help="Set a pre-reminder for each prayer.")
+    @commands.command(
+        name="setreminder",
+        help="Set a pre-reminder for each prayer. Provide the number of minutes before prayer time (0-60).",
+        brief="Set prayer reminder offset"
+    )
     async def set_reminder(self, ctx, minutes: int):
         if ctx.guild.id not in self.guild_settings:
             return await ctx.send("❌ Set location first with `!location`.")
@@ -54,11 +62,19 @@ class PrayerTimesCog(commands.Cog, name="Prayer Times Commands"):
         self.guild_settings[ctx.guild.id]['reminder_offset'] = minutes
         await ctx.send(f"⏰ Pre-reminder set to **{minutes}** minutes before each prayer.")
 
-    @commands.command(name="pray", help="Go to pray")
+    @commands.command(
+        name="pray",
+        help="Trigger a manual prayer reminder. Optionally include a name to personalize the message.",
+        brief="Manual prayer reminder"
+    )
     async def go_to_prayer(self, ctx, name="NoOne"):
         await ctx.send(f"{name}, it's time to pray!")
 
-    @commands.command(name="prayertimes", help="Get prayer times for a location.")
+    @commands.command(
+        name="prayertimes",
+        help="Get the prayer times for your set location. Optionally, provide a date in DD-MM-YYYY format to view times for that day.",
+        brief="Display prayer times"
+    )
     async def get_prayer_times(self, ctx, date_str: str = None):
         if ctx.guild.id not in self.guild_settings:
             return await ctx.send("❌ Set location first with `!location`.")
@@ -85,8 +101,8 @@ class PrayerTimesCog(commands.Cog, name="Prayer Times Commands"):
 
     @commands.command(
         name="hijri",
-        help="Get Hijri date information.\nUsage: `!hijri [DD-MM-YYYY]`",
-        brief="Show Hijri calendar information"
+        help="Get Hijri date information for your set location. If no date is provided, shows the current Hijri date; if a Gregorian date is given (DD-MM-YYYY), converts it.",
+        brief="Display Hijri date info"
     )
     async def get_hijri_date(self, ctx, date_str: str = None):
         if date_str is None:
@@ -114,7 +130,11 @@ class PrayerTimesCog(commands.Cog, name="Prayer Times Commands"):
             except ValueError:
                 await ctx.send("⚠️ Invalid date format. Use **DD-MM-YYYY**.")
 
-    @commands.command(name="nextprayer", help="Get the next prayer time.")
+    @commands.command(
+        name="nextprayer",
+        help="Display the next upcoming prayer and the time remaining until it.",
+        brief="Next prayer countdown"
+    )
     async def next_prayer(self, ctx):
         if ctx.guild.id not in self.guild_settings:
             return await ctx.send("❌ Set location first with `!location`.")
