@@ -4,9 +4,6 @@ import discord
 from dotenv import load_dotenv
 from discord.ext import commands
 
-
-from uhhhh import Zakat
-
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -24,6 +21,7 @@ async def on_ready():
     await bot.load_extension('cogs.questions')
     await bot.load_extension('cogs.quran')
     await bot.load_extension('cogs.config')
+    await bot.load_extension('cogs.zakat')
     print("All cogs loaded!")
 
 bot.run(TOKEN)

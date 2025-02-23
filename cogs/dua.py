@@ -17,7 +17,7 @@ class DuaReminder(commands.Cog):
 
     def load_dua(self): 
         try: 
-            with open('en.json', 'r', encoding='utf-8') as f: 
+            with open('data/hadith_en.json', 'r', encoding='utf-8') as f:
                 data = json.load(f) 
                 return data
         except FileNotFoundError: 

@@ -16,7 +16,7 @@ class HadithCommands(commands.Cog):
 
     def load_hadiths(self): 
         try: 
-            with open('nawawi40.json', 'r', encoding='utf-8') as f: 
+            with open('data/nawawi40.json', 'r', encoding='utf-8') as f:
                 data = json.load(f) 
                 hadiths = data['hadiths']
                 formatted_hadiths = [

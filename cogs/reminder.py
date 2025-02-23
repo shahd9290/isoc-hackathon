@@ -16,7 +16,7 @@ class SunnahReminder(commands.Cog):
 
     def load_sunnah(self): 
         try: 
-            with open('reminders.json', 'r', encoding='utf-8') as f: 
+            with open('data/reminders.json', 'r', encoding='utf-8') as f:
                 data = json.load(f) 
                 reminders = data['reminders']
                 formatted_reminders = [

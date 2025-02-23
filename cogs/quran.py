@@ -22,7 +22,7 @@ class Quran(commands.Cog):
         with open("data/quran.json", encoding='utf-8') as quran:
             self.quran = json.load(quran)
 
-        with open("data/en.json", encoding='utf-8') as en:
+        with open("data/quran_en.json", encoding='utf-8') as en:
             self.quran_en = json.load(en)
 
         with open("data/transliteration.json", encoding='utf-8') as transliteration:
