@@ -16,6 +16,7 @@ async def on_ready():
     # Load both cogs
     await bot.load_extension("cogs.reminder")
     await bot.load_extension("cogs.dua")
+    await bot.load_extension('cogs.hadith')
     print("All cogs loaded!")
 
 bot.run(TOKEN)

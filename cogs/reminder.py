@@ -16,34 +16,35 @@ class SunnahReminder(commands.Cog):
 
     def load_sunnah(self): 
         try: 
-            with open('nawawi40.json', 'r', encoding='utf-8') as f: 
+            with open('reminders.json', 'r', encoding='utf-8') as f: 
                 data = json.load(f) 
-                hadiths = data['hadiths']
-                formatted_hadiths = [
+                reminders = data['reminders']
+                formatted_reminders = [
                     {
-                         "text": hadith['english']['text'],
-                        "source": f"Narrated by {hadith['english']['narrator']}"
+                        "text": reminder['text'],
+                        "source": reminder['source'],
+                        "title": reminder['title']
                     }
-                    for hadith in hadiths 
+                    for reminder in reminders 
                 ]
-                return formatted_hadiths
+                return data['reminders']
         except FileNotFoundError: 
-            print("Sunnah not found!")
+            print("Sunnah Reminder not found!")
             return []
 
     @tasks.loop(seconds = 10 )
     async def reminder(self): 
         channel = self.bot.get_channel(1342876392165212200) #channel ID
         if self.sunnah: 
-            hadith = random.choice(self.sunnah)
+            reminder = random.choice(self.sunnah)
             
             embed = discord.Embed(
-                title="Daily Hadith Reminder from Imam Nawawi's collection of 40 Hadith", 
-                description=hadith['text'],
-                color=discord.Color.green(),
+                title=reminder['title'],
+                description=reminder['text'],
+                color=discord.Color.red()
             )
-            embed.set_footer(text=hadith['source'])
-            embed.timestamp = discord.utils.utcnow() #Adds the current date and time to the discord embed message 
+            embed.set_footer(text=f"Source: {reminder['source']}")
+            embed.timestamp = discord.utils.utcnow() 
             await channel.send(embed=embed)
 
             

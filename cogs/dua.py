@@ -35,6 +35,7 @@ class DuaReminder(commands.Cog):
                 color=discord.Color.green()
             )
             embed.set_footer(text=f"Source: {dua['source']}")
+            embed.timestamp = discord.utils.utcnow()
             await channel.send(embed=embed)
     @reminder.before_loop
     async def before_reminder(self):
