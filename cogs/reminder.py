@@ -31,12 +31,22 @@ class SunnahReminder(commands.Cog):
             print("Sunnah not found!")
             return []
 
-    @tasks.loop(minutes = 1)
+    @tasks.loop(seconds = 10 )
     async def reminder(self): 
         channel = self.bot.get_channel(1342876392165212200) #channel ID
         if self.sunnah: 
-            sunnah = random.choice(self.sunnah)
-            await channel.send(f"{sunnah['text']} - {sunnah['source']}")
+            hadith = random.choice(self.sunnah)
+            
+            embed = discord.Embed(
+                title="Daily Hadith Reminder from Imam Nawawi's collection of 40 Hadith", 
+                description=hadith['text'],
+                color=discord.Color.green(),
+            )
+            embed.set_footer(text=hadith['source'])
+            embed.timestamp = discord.utils.utcnow() #Adds the current date and time to the discord embed message 
+            await channel.send(embed=embed)
+
+            #await channel.send(f"{sunnah['text']} - {sunnah['source']}")
 
     @reminder.before_loop
     async def before_reminder(self): 
