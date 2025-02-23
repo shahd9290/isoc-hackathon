@@ -43,7 +43,7 @@ class Questions(commands.Cog):
                 for i in range(len(options)):
                     desc += f"{i+1}. {options[i]}\n"
                     options[i] = options[i].lower()
-                embed = discord.Embed(title=question, colour=discord.Colour.red(), description=desc)
+                embed = discord.Embed(title=question, colour=discord.Colour.purple(), description=desc)
                 answer = questionJson["answer"].lower()
                 ans_index = options.index(answer) + 1
                 await ctx.send(embed=embed)
