@@ -32,7 +32,7 @@ class SunnahReminder(commands.Cog):
             print("Sunnah Reminder not found!")
             return []
 
-    @tasks.loop(seconds = 10 )
+    @tasks.loop(seconds = 3600 )
     async def reminder(self): 
         channel = self.bot.get_channel(1342876392165212200) #channel ID
         if self.sunnah: 

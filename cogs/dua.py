@@ -24,7 +24,7 @@ class DuaReminder(commands.Cog):
             print("Duas not found!")
             return []
 
-    @tasks.loop(seconds = 10)
+    @tasks.loop(seconds = 3600)
     async def reminder(self): 
         channel = self.bot.get_channel(1343180275831672902) #channel ID
         if self.dua: 
