@@ -70,8 +70,7 @@ class Quran(commands.Cog):
         arabic = self.quran[str(surah["id"])][verse_num]["text"]
         trans = self.transliteration[str(surah["id"])][verse_num]["text"]
         english = self.quran_en[str(surah["id"])][verse_num]["text"]
-        await ctx.send(
-            f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah["transliteration"]}:{verse_num+1}")
+        await ctx.send(f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah['transliteration']}:{verse_num+1}")
 
     @commands.command()
     async def surah(self, ctx, *args):
@@ -89,7 +88,7 @@ class Quran(commands.Cog):
         name_trans = self.chapters[int(surah_num)-1]["transliteration"]
         msg = f"# __{name} - {name_trans}__ \n"
         for verse in self.quran[surah_num]:
-            next_verse = f"## ﴾{verse["verse"]}﴿ - {verse["text"]}\n"
+            next_verse = f"## ﴾{verse['verse']}﴿ - {verse['text']}\n"
             if len(msg) + len(next_verse) < 2000:
                 msg += next_verse
             else:
