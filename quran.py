@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 import json
 import random
 
@@ -27,7 +28,7 @@ class Quran(commands.Cog):
         with open("data/chapters.json", encoding='utf-8') as chapters:
             self.chapters = json.load(chapters)
 
-    @commands.command()
+    @commands.command(help="Generate a random verse from the Quran! Usage: !randomverse")
     async def randomverse(self, ctx) -> None:
         """
         Generates a random verse of the Quran with translation and meaning.
@@ -38,7 +39,7 @@ class Quran(commands.Cog):
         verse_num = random.randint(0, surah["total_verses"]-1)
         await self.response(ctx, surah, verse_num)
 
-    @commands.command()
+    @commands.command(help="Retrieve a verse from the Quran!Usage: !quran <surah:verse>")
     async def verse(self,ctx, *args):
         """
         Generates a verse of the Quran based on the user's input, along with translation and meaning.
@@ -72,7 +73,7 @@ class Quran(commands.Cog):
         english = self.quran_en[str(surah["id"])][verse_num]["text"]
         await ctx.send(f"# {arabic}\n## {trans} \n\n**Meaning:** {english}\n-# {surah['transliteration']}:{verse_num+1}")
 
-    @commands.command()
+    @commands.command(help="Retrieve a Surah from the Quran!\nUsage: !surah <surah>")
     async def surah(self, ctx, *args):
         """
         Fetches a Surah from the Quran and returns it in full to the user.
@@ -80,10 +81,20 @@ class Quran(commands.Cog):
         :param args: The Surah number which the user wishes to call (e.g 114)
         :return: None
         """
-        if len(args) == 0 or not args[0].isdigit():
-            await ctx.send("Please enter a valid number for the surah! (1 - 114)")
+        surah_num = 0
+        if len(args) == 0:
+            await ctx.send("Please enter a valid name or number for the surah! (1 - 114)")
             return
-        surah_num = args[0]
+        elif not args[0].isdigit():
+            # get number from chapters.json
+            for chapter in self.chapters:
+                if chapter["transliteration"] == args[0]:
+                    surah_num = str(chapter["id"])
+                    break
+            if surah_num == 0:
+                await ctx.send("Invalid Input! Run !view surahs to see the correct formatting")
+        else:
+            surah_num = args[0]
         name = self.chapters[int(surah_num)-1]["name"]
         name_trans = self.chapters[int(surah_num)-1]["transliteration"]
         msg = f"# __{name} - {name_trans}__ \n"
@@ -95,3 +106,55 @@ class Quran(commands.Cog):
                 await ctx.send(msg)
                 msg = next_verse
         await ctx.send(msg)
+
+    @commands.command(help="Get a list of all the surahs!")
+    async def view(self, ctx, *args):
+        if len(args) == 0:
+            ctx.send("Please state what you would like to view!")
+            return
+        elif args[0] == "surahs":
+            await self.paginated_surah_list(ctx)
+        else:
+            ctx.send("Invalid!")
+
+    async def paginated_surah_list(self, ctx):
+        items_per_page = 10
+        pages = [self.chapters[i:i+items_per_page] for i in range(0, len(self.chapters), items_per_page)]
+
+        view = SurahPaginator(pages)
+        await ctx.send(embed=view.get_embed(), view=view)
+
+class SurahPaginator(discord.ui.View):
+    def __init__(self, pages):
+        super().__init__()
+        self.pages = pages
+        self.current_page = 0
+
+    def get_embed(self):
+        embed = discord.Embed(
+            title="List of Surahs from the Quran",
+            description=f"Page {self.current_page + 1} of {len(self.pages)}",
+            color=discord.Colour.blue()
+        )
+        for chapter in self.pages[self.current_page]:
+            embed.add_field(name=f"{chapter['name']} .{chapter['id']} ", value=f"{chapter['transliteration']} - {chapter['translation']}", inline=False)
+        return embed
+
+    @discord.ui.button(label="◀", style=discord.ButtonStyle.primary, disabled=True)
+    async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Handles previous page navigation."""
+        self.current_page -= 1
+        self.update_buttons()
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
+    @discord.ui.button(label="▶", style=discord.ButtonStyle.primary)
+    async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+        """Handles next page navigation."""
+        self.current_page += 1
+        self.update_buttons()
+        await interaction.response.edit_message(embed=self.get_embed(), view=self)
+
+    def update_buttons(self):
+        """Disables or enables buttons based on the page number."""
+        self.prev_button.disabled = self.current_page == 0
+        self.next_button.disabled = self.current_page == len(self.pages) - 1

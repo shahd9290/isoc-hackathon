@@ -16,7 +16,7 @@ class Questions(commands.Cog):
         """
         self.bot = bot
 
-    @commands.command()
+    @commands.command(help="Test your islamic knowledge with a fun quiz!")
     async def quiz(self, ctx) -> None:
         """
         The quiz command, used to generate and run the interactive Islamic quiz.
